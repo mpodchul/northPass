@@ -102,6 +102,72 @@ namespace np.Controllers
             return user;
         }
 
+        // PUT: api/Users/
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
+        // more details see https://aka.ms/RazorPagesCRUD.
+        [HttpPut]
+        [Route("user/{userId}/course/{courseId}")]
+        public async Task<IActionResult> EnrollUser(int userId, int courseId)
+        {
+            var newUc = new UserCourse()
+            {
+                UserId = userId,
+                CourseId = courseId
+            };
+
+            _context.Add(newUc);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(userId))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route("user/{userId}/course/{courseId}")]
+        public async Task<ActionResult<UserCourse>> WithdrawUser(int userId, int courseId)
+        {
+            var userCourse = _context.UserCourses.Where(x => x.UserId == userId && x.CourseId == courseId).FirstOrDefault();
+
+            if (userCourse == null)
+            {
+                return NotFound();
+            }
+
+            _context.UserCourses.Remove(userCourse);
+            await _context.SaveChangesAsync();
+
+            return userCourse;
+        }
+
+        [HttpGet("user/{userId}/courses")]
+        public async Task<ActionResult<List<Course>>> GetUserCourses(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var userCourses = _context.UserCourses.Where(x => x.UserId == userId).Select(x => x.Course).ToList();
+
+            return userCourses;
+        }
+
         private bool UserExists(int id)
         {
             return _context.Users.Any(e => e.UserId == id);

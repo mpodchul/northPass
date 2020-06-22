@@ -23,9 +23,19 @@ namespace np.Controllers
 
         // GET: api/Courses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Course>>> GetCourses()
+        public async Task<ActionResult<IEnumerable<CourseWithCount>>> GetCourses()
         {
-            return await _context.Courses.ToListAsync();
+            var courses = await _context.Courses.ToListAsync();
+            List<CourseWithCount> coursesWithCounts = new List<CourseWithCount>();
+
+            foreach (Course course in courses)
+            {
+                CourseWithCount cwc = new CourseWithCount(course) { };
+                cwc.StudentsCount = _context.UserCourses.Where(y => y.CourseId == cwc.CourseId).Select(x => x.UserId).ToList().Count();
+                coursesWithCounts.Add(cwc);
+            }
+
+            return coursesWithCounts;
         }
 
         // GET: api/Courses/5

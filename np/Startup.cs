@@ -28,12 +28,15 @@ namespace np
         {
             services.AddControllers();
 
+            services.AddControllers().AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
             services.AddDbContext<NPContext>(options =>
                     options.UseSqlite(Configuration.GetConnectionString("NPContext")));
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "NP api", Version = "v1" });
+                
             });
         }
 

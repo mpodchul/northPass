@@ -24,6 +24,9 @@ namespace np.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("StudentsCount")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("CourseId");
 
                     b.ToTable("Courses");
